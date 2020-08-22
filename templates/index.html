@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>맛집 일기</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poor+Story&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <style>
+        * {
+            font-family: 'Poor Story', cursive;
+        }
+
+
+        .posting-box {
+            max-width: 500px;
+            width: 90%;
+            margin: 20px auto 20px auto;
+
+            padding: 20px;
+            background-color: whitesmoke;
+        }
+
+        .foodbox > h3 {
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .foodbox > h3 > span {
+            font-weight: normal;
+            font-size: 1.2rem;
+        }
+
+        .foodbox > p {
+            font-size: 1.2rem;
+        }
+        .star_rating {font-size:0; letter-spacing:-4px;}
+.star_rating div {
+    font-size:22px;
+    letter-spacing:0;
+    display:inline-block;
+    margin-left:5px;
+    color:#ccc;
+    text-decoration:none;
+    cursor: pointer;
+}
+.star_rating div:first-child {margin-left:0;}
+.star_rating div.on {color:#777;}
+
+    </style>
+    <script>
+        $(document).ready(function () {
+            $(".star_rating div").click(function() {
+                $(this).parent().children("div").removeClass("on");
+                $(this).addClass("on").prevAll("div").addClass("on");
+                return false;
+            });
+
+            show();
+        });
+
+        function show() {
+            $('#food-box').empty();
+            $.ajax({
+                type: "GET",
+                url: "/show",
+                data: {},
+                success: function (response) {
+                    console.log('response', response);
+                    if (response['result'] == 'success') {
+                        let foodboxes = response['foodboxes'];
+                        console.log(foodboxes)
+                        for (let i = 0; i < foodboxes.length; i++) {
+                            let name = foodboxes[i]['name']
+                            let date = foodboxes[i]['date']
+                            let address = foodboxes[i]['address']
+                            let phone =  foodboxes[i]['phone']
+                            let image = foodboxes[i]['image']
+                            let type= foodboxes[i]['type']
+                            let review = foodboxes[i]['review']
+                            let point = foodboxes[i]['point']
+
+                            let ratingHtml = `
+                                <div class="star_rating">
+                                    <div class="rating-star on">★</div>
+                                    <div class="rating-star">★</div>
+                                    <div class="rating-star">★</div>
+                                    <div class="rating-star">★</div>
+                                    <div class="rating-star">★</div>
+                                </div>
+                            `;
+
+                            let temp_html = `<div class='column is-4'>
+
+                                                <div class="card">
+                                                    <div class="card-image">
+                                                        <div>
+                                                            <div>
+                                                                <input type="checkbox" id="check_test_box" />
+                                                                <span class="badge badge-pill badge-primary">${type}</span>
+                                                                  <span class="badge badge-pill badge-warning">${address}</span>
+                                                                  <span class="badge badge-pill badge-success">${phone}</span>
+                                                            </div>
+
+
+                                                            <figure class="image is-4by3">
+                                                                <img src="${image}" alt="image">
+                                                            </figure>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-content foodbox">
+                                                        <h3>${name} <span>(${date})</span></h3>
+                                                        ${ratingHtml}
+                                                        <p>${review}</p>
+                                                    </div>
+                                                </div>
+                                            </div>`
+                            $('#food-box').append(temp_html)
+                        }
+                    }
+                }
+            })
+        }
+
+        function save() {
+            console.log('1123df')
+            let name = $('#input-name').val();
+            let date = $('#input-date').val();
+            let address = $('#input-address').val();
+            let phone = $('#input-phone').val();
+            let image = $('#input-image').val();
+            let type = $('#type').val();
+            let review = $('#input-review').val();
+            console.log('fdsaabc', );
+            let point = $('#input-point .on').length;
+
+            $.ajax({
+                type: "POST",
+                url: "/save",
+                data: {name_give: name, date_give: date,address_give: address,phone_give: phone,image_give: image, type_give: type, review_give: review, point_give: point},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert(response['msg'])
+                        window.location.reload();
+                    }
+                }
+            })
+        }
+    </script>
+
+</head>
+<body>
+<section class="hero is-danger">
+    <div class="hero-body has-text-centered">
+        <div class="container">
+            <h1 class="title">
+                맛집 일기
+            </h1>
+            <h2 class="subtitle">
+                내가 다녀온 식당 후기 모음
+            </h2>
+        </div>
+    </div>
+</section>
+<div class="posting-box">
+    <div class="field">
+        <label class="label">식당명</label>
+        <div class="control">
+            <input id="input-name" class="input" type="text" placeholder="식당명">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">방문 날짜</label>
+        <div class="control">
+            <input id="input-date" class="input" type="text" placeholder="yyyy-mm-dd">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">식당 주소</label>
+        <div class="control">
+            <input id="input-address" class="input" type="text" placeholder="도로명 주소 넣기">
+        </div>
+    </div>
+       <div class="field">
+        <label class="label">식당 전화번호</label>
+        <div class="control">
+            <input id="input-phone" class="input" type="text" placeholder="번호입력">
+        </div>
+
+    </div>
+    <div class="field">
+        <label class="label">이미지 주소</label>
+        <div class="control">
+            <input id="input-image" class="input" type="text" placeholder="이미지 url을 복사해서 넣기">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">메뉴 타입</label>
+        <div class="control">
+         <select class="custom-select" id="type">
+                        <option selected value=""> -- 메뉴타입 선택 --</option>
+                        <option value="한식">한식</option>
+                        <option value="중식">중식</option>
+                        <option value="양식">양식</option>
+                        <option value="일식">일식</option>
+                        <option value="동남아식">동남아식</option>
+                        <option value="분식">분식</option>
+                        <option value="디저트,카페">디저트,카페</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+    </div>
+      <div class="field">
+        <label class="label">맛평가</label>
+        <div class="control">
+            <textarea id="input-review" class="textarea" placeholder="맛평가 작성"></textarea>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">평점</label>
+        <div class="control">
+            <div id="input-point" class="star_rating">
+                <div class="rating-star on">★</div>
+                <div class="rating-star">★</div>
+                <div class="rating-star">★</div>
+                <div class="rating-star">★</div>
+                <div class="rating-star">★</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button onclick="save()" class="is-danger button is-link">기록저장</button>
+        </div>
+        <div class="control">
+            <button onclick=modify()" class="is-danger button is-link">기록수정</button>
+        </div>
+    </div>
+</div>
+
+    <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    필터링
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#">메뉴 타입별</a>
+    <a class="dropdown-item" href="#">평점별</a>
+  </div>
+</div>
+   <div class='columns is-multiline' id="food-box">
+
+
+
+    <div> class='column is-4'>
+    </div>>
+   </div>
+</body>
+</html>
