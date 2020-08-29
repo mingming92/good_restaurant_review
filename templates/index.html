@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>맛집 일기</title>
-
+<meta property="og:title" content="맛집일기 맛집일기" />
+<meta property="og:description" content="나만의 맛집리스트" />
+<meta property="og:image" content="{{ url_for('static', filename='ogimage.png') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Poor+Story&display=swap" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -153,6 +155,43 @@
                 }
             })
         }
+        function delete_rec()
+     {
+        var sum = "";
+        var count = 1;
+        $('#tbl_add input:checkbox:checked').each(function()
+        {
+         $(this).each(function()
+          {
+           var aaa = $(this).parent('th').next('td').text();
+           //alert(aaa)
+           if(count == 1)
+           {
+            aaa = " where ID="+aaa;
+            sum += aaa;
+           }else
+           {
+            aaa = " or ID="+aaa;
+            sum += aaa;
+           }
+           count++;
+          })
+        })
+      var chk = confirm("삭제하시겠습니까?")
+       if(chk)
+        {
+          //alert(sum);
+          //alert(aaa)
+          if($('#tbl_add input:checkbox:checked').length== 0)
+          {
+            alert("삭제하실 목록을 체크하여 주십시오.")
+            return;
+          } else{
+           location.href = "./insert_device.php?mode=delete&sum="+sum;
+          }
+          //
+        }
+     }
     </script>
 
 </head>
@@ -242,6 +281,9 @@
         </div>
         <div class="control">
             <button onclick=modify()" class="is-danger button is-link">기록수정</button>
+        </div>
+         <div class="control">
+            <button onclick=delete()" class="is-danger button is-link">기록삭제</button>
         </div>
     </div>
 </div>
